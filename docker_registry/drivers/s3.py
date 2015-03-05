@@ -130,6 +130,19 @@ class Storage(coreboto.Base):
         except IOError as e:
             raise e
         mp.complete_upload()
+        # do this to get the etag correct as the md5
+        key = self.makeKey(path)
+        if not key.exists():
+            raise IOError('No such key: \'{0}\''.format(path))
+        new_key = key.copy(self._config.boto_bucket, path + "-tmp")
+        if not new_key.exists():
+            raise IOError('No such key: \'{0}\''.format(path + "-tmp"))
+        key.delete()
+        correct_key = new_key.copy(self._config.boto_bucket, path)
+        if not correct_key.exists():
+            raise IOError('No such key: \'{0}\''.format(path))
+        new_key.delete()
+
 
     def content_redirect_url(self, path):
         path = self._init_path(path)

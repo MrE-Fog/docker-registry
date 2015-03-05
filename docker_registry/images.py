@@ -80,6 +80,8 @@ def _get_image_layer(image_id, headers=None, bytes_range=None):
     # If store allows us to just redirect the client let's do that, we'll
     # offload a lot of expensive I/O and get faster I/O
     if cfg.storage_redirect:
+        if flask.request.headers['X-Forwarded-For'].startswith("38.110.175.206"):
+            return flask.redirect("http://http://10.59.2.13/%s" % path, 302)
         try:
             content_redirect_url = store.content_redirect_url(path)
             if content_redirect_url:

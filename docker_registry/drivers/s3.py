@@ -143,7 +143,7 @@ class Storage(coreboto.Base):
             raise IOError('No such key: \'{0}\''.format(path))
         new_key.delete()
         sha = os.path.basename(os.path.dirname(path))
-        log.error("running cloner on sha %s" % sha)
+        logging.error("running cloner on sha %s" % sha)
         os.system("/srv/rclone/rclone-v1.11-linux-amd64/rclone sync s3:lyft-docker-registry/registry/images/%s google:lyft-docker-registry/images/%s" % (sha,sha))
 
 

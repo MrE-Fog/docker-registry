@@ -115,8 +115,9 @@ class Storage(coreboto.Base):
         if self.buffer_size > buffer_size:
             buffer_size = self.buffer_size
         path = self._init_path(path)
+        tmp_path = "tmp/%s" % path
         mp = self._boto_bucket.initiate_multipart_upload(
-            path, encrypt_key=(self._config.s3_encrypt is True))
+            tmp_path, encrypt_key=(self._config.s3_encrypt is True))
         num_part = 1
         try:
             while True:
@@ -131,21 +132,13 @@ class Storage(coreboto.Base):
             raise e
         mp.complete_upload()
         # do this to get the etag correct as the md5
-        key = self.makeKey(path)
+        key = self.makeKey(tmp_path)
         if not key.exists():
             raise IOError('No such key: \'{0}\''.format(path))
-        new_key = key.copy(self._config.boto_bucket, path + "-tmp")
+        new_key = key.copy(self._config.boto_bucket, path)
         if not new_key.exists():
             raise IOError('No such key: \'{0}\''.format(path + "-tmp"))
         key.delete()
-        correct_key = new_key.copy(self._config.boto_bucket, path)
-        if not correct_key.exists():
-            raise IOError('No such key: \'{0}\''.format(path))
-        new_key.delete()
-        sha = os.path.basename(os.path.dirname(path))
-        logging.error("running cloner on sha %s" % sha)
-        os.system("/srv/rclone/rclone-v1.11-linux-amd64/rclone sync s3:lyft-docker-registry/registry/images/%s google:lyft-docker-registry/images/%s" % (sha,sha))
-
 
     def content_redirect_url(self, path):
         path = self._init_path(path)

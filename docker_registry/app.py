@@ -110,10 +110,6 @@ def init():
                           app_version=__version__
                           )
         bugsnag.flask.handle_exceptions(app)
-    # Configure flask_cors
-    for i in cfg.cors.keys():
-        app.config['CORS_%s' % i.upper()] = cfg.cors[i]
-    CORS(app)
 
 
 def _adapt_smtp_secure(value):

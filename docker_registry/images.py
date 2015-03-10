@@ -82,7 +82,7 @@ def _get_image_layer(image_id, headers=None, bytes_range=None):
     # offload a lot of expensive I/O and get faster I/O
     if cfg.storage_redirect:
         if cfg.nas_redirect and flask.request.headers['X-Forwarded-For'].startswith(cfg.office_ip):
-            return flask.redirect("http://%s/lyft-docker-registry/%s" % (cfs.nas_ip, path), 302)
+            return flask.redirect("http://%s/lyft-docker-registry/%s" % (cfg.nas_ip, path), 302)
         try:
             content_redirect_url = store.content_redirect_url(path)
             if content_redirect_url:
